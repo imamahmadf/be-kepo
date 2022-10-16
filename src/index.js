@@ -17,6 +17,9 @@ app.get("/", (req, res) => {
   res.status(200).send("<h4>Integrated mysql with express</h4>");
 });
 
+const { sequelize } = require("./helper/sequelize");
+// sequelize.sync({ alter: true });
+
 const {
   userRouters,
   postRouter,
@@ -29,8 +32,6 @@ app.use("/post", postRouter);
 app.use("/komentar", komentarRouter);
 app.use("/suka", sukaRouter);
 
-// app.use("/kepo", userRouters);
-// app.use("/album", uploadRouter);
-// app.use("/komentar", komentarRouter);
+app.use("/profil", express.static(`${__dirname}/public/profil`));
 
 app.listen(PORT, () => console.log("API running:", PORT));
