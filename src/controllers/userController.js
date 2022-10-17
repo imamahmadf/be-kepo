@@ -97,9 +97,9 @@ module.exports = {
   },
 
   editUser: (req, res) => {
-    console.log("edit profile1 " + req.body.editNama);
+    console.log("edit profile1 " + req);
 
-    const { editNama, editNamaPengguna, editBio, id, fotolama } = req.body;
+    const { editNama, editNamaPengguna, editBio, id_user, old_img } = req.body;
 
     const filePath = "profil";
 
@@ -107,10 +107,10 @@ module.exports = {
     if (req.file?.filename) {
       const { filename } = req.file;
 
-      const path = `${__dirname}/../public/${fotolama}`;
+      const path = `${__dirname}/../public/${old_img}`;
       fs.unlink(path, (err) => {
         if (err) {
-          console.error(err);
+          console.error("erornya =>" + err);
           return;
         }
 
@@ -121,7 +121,7 @@ module.exports = {
         editNama,
         editNamaPengguna,
         editBio,
-        id,
+        id_user,
         foto: `/${filePath}/${filename}`,
       };
 
@@ -131,8 +131,9 @@ module.exports = {
         editData.editNamaPengguna
       )}, fotoProfil = ${db.escape(editData.foto)}, bio = ${db.escape(
         editData.editBio
-      )} where id_user = ${db.escape(editData.id)};`;
+      )} where id_user = ${db.escape(editData.id_user)};`;
 
+      console.log(sqlEdit);
       db.query(sqlEdit, (err, results) => {
         if (err) {
           res.status(500).send(err);

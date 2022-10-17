@@ -104,19 +104,6 @@ module.exports = {
   },
 
   deletePost: (req, res) => {
-    console.log("params " + req.params.idDelete);
-    console.log(req.body);
-    let sqlGet = `delete p, k from post p join komentar k on p.id_post = k.id_komen_ini_ada_di_post_apa where p.id_post =${db.escape(
-      req.params.idDelete
-    )};`;
-
-    db.query(sqlGet, (err, results) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-      res.status(200).send(results);
-    });
-
     const path = `${__dirname}/../public/${req.body.old_img}`;
 
     console.log("path: " + path);
@@ -131,7 +118,19 @@ module.exports = {
 
       //file removed
     });
-    return res.send("movie deleted");
+
+    console.log("params " + req.params.idDelete);
+    console.log(req.body);
+    let sqlGet = `delete p, k from post p left join komentar k on p.id_post = k.id_komen_ini_ada_di_post_apa where p.id_post =${db.escape(
+      req.params.idDelete
+    )};`;
+
+    db.query(sqlGet, (err, results) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+      res.status(200).send("tessss");
+    });
   },
 
   getProfile: (req, res) => {

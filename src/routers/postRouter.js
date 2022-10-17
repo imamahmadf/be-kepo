@@ -16,6 +16,6 @@ route.post(
 route.get("/get", postController.getPost);
 route.get("/:idContent", postController.getContent);
 route.patch("/edit/:idEdit", postController.editPost);
-route.delete("/delete/:idDelete", postController.deletePost);
+route.post("/delete/:idDelete", postController.deletePost);
 route.get("/profile/:username", postController.getProfile);
 module.exports = route;
