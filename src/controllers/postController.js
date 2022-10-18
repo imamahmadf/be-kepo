@@ -5,7 +5,7 @@ const fs = require("fs");
 module.exports = {
   postImage: (req, res) => {
     console.log("uploader foto " + req.file);
-    const { keterangan, id_user_yg_post, lokasi } = req.body;
+    const { keterangan, id_user_yg_post, lokasi, tanggal } = req.body;
     // console.log("uploader foto2 " + req.body);
 
     const filePath = "post";
@@ -16,9 +16,10 @@ module.exports = {
       ${db.escape(`/${filePath}/${filename}`)},
       ${db.escape(keterangan)},
       ${db.escape(id_user_yg_post)},
-      ${db.escape(lokasi)});`;
+      ${db.escape(lokasi)},  ${db.escape(tanggal)});`;
 
     db.query(sqlInsert, (err, results) => {
+      console.log(sqlInsert);
       if (err) {
         res.status(500).send(err);
       }
@@ -64,7 +65,7 @@ module.exports = {
   // },
   getPost: (req, res) => {
     let sqlGet =
-      "select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC;";
+      "select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC;";
 
     db.query(sqlGet, (err, results) => {
       if (err) {
@@ -75,7 +76,7 @@ module.exports = {
   },
   getContent: (req, res) => {
     console.log(req.params.idContent);
-    let sqlGet = `select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil from post p join users u on u.id_user= p.id_user_yg_post where id_post = ${db.escape(
+    let sqlGet = `select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal from post p join users u on u.id_user= p.id_user_yg_post where id_post = ${db.escape(
       req.params.idContent
     )};`;
 

@@ -6,12 +6,13 @@ const routers = express.Router();
 const fileUploader = require("../helper/uploader");
 
 routers.get("/login", userController.getLogin);
+routers.get("/profil", userController.getProfil);
 routers.post("/register", userController.addUser);
 routers.patch("/verified", auth, userController.verification);
 routers.patch(
-  "/edit",
+  "/:idEdit",
   fileUploader({
-    destinationFolder: "post",
+    destinationFolder: "profil",
     fileType: "image",
     prefix: "POST",
   }).single("image"),

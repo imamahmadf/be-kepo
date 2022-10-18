@@ -6,14 +6,49 @@ const fs = require("fs");
 
 module.exports = {
   getLogin: (req, res) => {
-    console.log("nama pengguna" + req.query.namaPengguna);
-    console.log("katasandi" + req.query.kataSandi);
+    req.query.kataSandi = Crypto.createHmac("sha1", "hash123")
+      .update(req.query.kataSandi)
+      .digest("hex");
+    let scriptQuery = `Select * from users where namaPengguna=${db.escape(
+      req.query.namaPengguna
+    )} and kataSandi=${db.escape(req.query.kataSandi)};`;
+    console.log(req.query, scriptQuery);
+    db.query(scriptQuery, (err, results) => {
+      if (err) res.status(500).send(err);
+      if (results[0]) {
+        let {
+          id_user,
+          namaPengguna,
+          email,
+          kataSandi,
+          nama,
+          status,
+          bio,
+          fotoProfil,
+        } = results[0];
+        let token = createToken({
+          id_user,
+          namaPengguna,
+          email,
+          kataSandi,
+          nama,
+          status,
+          bio,
+          fotoProfil,
+        });
+        if (status != "verified") {
+          res.status(200).send(results);
+        } else {
+          res.status(200).send(results);
+        }
+      }
+    });
+  },
 
+  getProfil: (req, res) => {
     let scriptQuery = `select * from users where namaPengguna= ${db.escape(
       req.query.namaPengguna
-    )} or email= ${db.escape(
-      req.query.namaPengguna
-    )} and kataSandi = ${db.escape(req.query.kataSandi)};`;
+    )};`;
 
     db.query(scriptQuery, (err, result) => {
       console.log(scriptQuery);
@@ -21,10 +56,9 @@ module.exports = {
       res.status(200).send(result);
     });
   },
-
   addUser: (req, res) => {
     console.log(req.body);
-    let { namaPengguna, nama, fotoProfil, bio, email, kataSandi } = req.body;
+    let { namaPengguna, nama, email, kataSandi, fotoProfil, bio } = req.body;
     kataSandi = Crypto.createHmac("sha1", "hash123")
       .update(kataSandi)
       .digest("hex");
@@ -53,9 +87,15 @@ module.exports = {
           }
 
           // bahan data untuk membuat token
-          let { idusers, username, email, role, status } = results2[0];
+          let { id_user, nama, namaPengguna, email, status } = results2[0];
           // membuat token
-          let token = createToken({ idusers, username, email, role, status });
+          let token = createToken({
+            id_user,
+            nama,
+            namaPengguna,
+            email,
+            status,
+          });
 
           let mail = {
             from: `Admin <leadwear01@gmail.com>`,
@@ -97,9 +137,10 @@ module.exports = {
   },
 
   editUser: (req, res) => {
-    console.log("edit profile1 " + req);
+    console.log("iduser" + req.params.idEdit);
+    console.log("edit profile1 " + req.body.editBio);
 
-    const { editNama, editNamaPengguna, editBio, id_user, old_img } = req.body;
+    const { editNama, editNamaPengguna, editBio, old_img } = req.body;
 
     const filePath = "profil";
 
@@ -121,7 +162,7 @@ module.exports = {
         editNama,
         editNamaPengguna,
         editBio,
-        id_user,
+
         foto: `/${filePath}/${filename}`,
       };
 
@@ -131,7 +172,7 @@ module.exports = {
         editData.editNamaPengguna
       )}, fotoProfil = ${db.escape(editData.foto)}, bio = ${db.escape(
         editData.editBio
-      )} where id_user = ${db.escape(editData.id_user)};`;
+      )} where id_user = ${db.escape(req.params.idEdit)};`;
 
       console.log(sqlEdit);
       db.query(sqlEdit, (err, results) => {
@@ -145,15 +186,14 @@ module.exports = {
         editNama,
         editNamaPengguna,
         editBio,
-        id,
       };
-      console.log("tes" + editData.editNama);
+      console.log("tes123" + editData.editNama);
       let sqlEdit = `UPDATE users set nama = ${db.escape(
         editData.editNama
       )}, namaPengguna = ${db.escape(
         editData.editNamaPengguna
       )},  bio = ${db.escape(editData.editBio)} where id_user = ${db.escape(
-        editData.id
+        req.params.idEdit
       )};`;
 
       db.query(sqlEdit, (err, results) => {
@@ -163,65 +203,5 @@ module.exports = {
         res.status(200).send(results);
       });
     }
-  },
-
-  // /////////////contoh///////////////
-  editMovie: async (req, res) => {
-    const {
-      film_name,
-      duration,
-      year_released,
-      rating,
-      about,
-      studioId,
-      old_img,
-      id,
-    } = req.body;
-    const uploadFileDomain = "http://localhost:2000";
-    const filePath = "movie_images";
-
-    let editData = {};
-
-    if (req.file?.filename) {
-      // ada perubahan gambar
-      const { filename } = req.file;
-
-      const path = `${__dirname}/../public/movie_images/${old_img}`;
-      fs.unlink(path, (err) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-
-        //file removed
-      });
-
-      editData = {
-        film_name,
-        duration,
-        year_released,
-        rating,
-        img_src: `${uploadFileDomain}/${filePath}/${filename}`,
-        about,
-        studioId,
-      };
-    } else {
-      editData = {
-        film_name,
-        duration,
-        year_released,
-        rating,
-        about,
-        studioId,
-      };
-    }
-    await Movie.update(
-      { ...editData },
-      {
-        where: { id },
-      }
-    );
-
-    return res.send("movie edited");
   },
 };
