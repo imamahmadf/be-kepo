@@ -136,7 +136,7 @@ module.exports = {
     });
   },
 
-  editUser: (req, res) => {
+  editUser: async (req, res) => {
     console.log("iduser" + req.params.idEdit);
     console.log("edit profile1 " + req.body.editBio);
 
@@ -149,7 +149,7 @@ module.exports = {
       const { filename } = req.file;
 
       const path = `${__dirname}/../public/${old_img}`;
-      fs.unlink(path, (err) => {
+      await fs.unlink(path, (err) => {
         if (err) {
           console.error("erornya =>" + err);
           return;
@@ -174,12 +174,20 @@ module.exports = {
         editData.editBio
       )} where id_user = ${db.escape(req.params.idEdit)};`;
 
-      console.log(sqlEdit);
-      db.query(sqlEdit, (err, results) => {
-        if (err) {
-          res.status(500).send(err);
-        }
-        res.status(200).send(results);
+      console.log("tess11 " + sqlEdit);
+
+      db.query(sqlEdit, (err, results2) => {
+        let sqlGet = `select id_post, id_user, lokasi, namaPengguna, nama, fotoProfil, bio, foto from post p join users u on u.id_user= p.id_user_yg_post where namaPengguna = ${db.escape(
+          editData.editNamaPengguna
+        )};`;
+
+        db.query(sqlGet, (err, results3) => {
+          console.log("tes222" + sqlGet);
+          if (err) {
+            res.status(500).send(err);
+          }
+          res.status(200).send(results3);
+        });
       });
     } else {
       editData = {
@@ -195,12 +203,18 @@ module.exports = {
       )},  bio = ${db.escape(editData.editBio)} where id_user = ${db.escape(
         req.params.idEdit
       )};`;
-
-      db.query(sqlEdit, (err, results) => {
-        if (err) {
-          res.status(500).send(err);
-        }
-        res.status(200).send(results);
+      console.log("tess11 " + sqlEdit);
+      db.query(sqlEdit, (err, results3) => {
+        let sqlGet = `select id_post, id_user, lokasi, namaPengguna, nama, fotoProfil, bio, foto from post p join users u on u.id_user= p.id_user_yg_post where namaPengguna = ${db.escape(
+          editData.editNamaPengguna
+        )};`;
+        db.query(sqlGet, (err, results2) => {
+          console.log("tes222" + sqlGet);
+          if (err) {
+            res.status(500).send(err);
+          }
+          res.status(200).send(results2);
+        });
       });
     }
   },
