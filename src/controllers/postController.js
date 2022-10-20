@@ -65,7 +65,7 @@ module.exports = {
   // },
   getPost: (req, res) => {
     let sqlGet =
-      "select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC;";
+      "select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal, (select count(id_post) from suka s where s.id_post = p.id_post) total_suka, (select count(id_komen_ini_ada_di_post_apa) from komentar k where k.id_komen_ini_ada_di_post_apa = p.id_post) total_komentar from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC limit 3 offset 0;";
 
     db.query(sqlGet, (err, results) => {
       if (err) {
@@ -136,9 +136,12 @@ module.exports = {
 
   getProfile: (req, res) => {
     console.log(req.params.username);
-    let sqlGet = `select id_post, id_user, lokasi, namaPengguna, nama, fotoProfil, bio, foto from post p join users u on u.id_user= p.id_user_yg_post where namaPengguna = ${db.escape(
+    let sqlGet = `select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal, 
+    (select count(id_post) from suka s where s.id_post = p.id_post) total_suka,
+    (select count(id_komen_ini_ada_di_post_apa) from komentar k where k.id_komen_ini_ada_di_post_apa = p.id_post) total_komentar
+    from post p join users u on u.id_user= p.id_user_yg_post where namaPengguna = ${db.escape(
       req.params.username
-    )};`;
+    )} Order by id_post DESC;`;
 
     db.query(sqlGet, (err, results) => {
       console.log(results.data);

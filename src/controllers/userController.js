@@ -138,7 +138,7 @@ module.exports = {
 
   editUser: async (req, res) => {
     console.log("iduser" + req.params.idEdit);
-    console.log("edit profile1 " + req.body.editBio);
+    console.log("edit profile1 " + req.body.old_img);
 
     const { editNama, editNamaPengguna, editBio, old_img } = req.body;
 
