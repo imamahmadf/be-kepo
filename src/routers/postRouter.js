@@ -13,7 +13,7 @@ route.post(
   }).single("image"),
   postController.postImage
 );
-route.get("/get", postController.getPost);
+route.get("/get/:id", postController.getPost);
 route.get("/:idContent", postController.getContent);
 route.patch("/edit/:idEdit", postController.editPost);
 route.post("/delete/:idDelete", postController.deletePost);

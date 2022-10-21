@@ -26,46 +26,11 @@ module.exports = {
       res.status(200).send(results);
     });
   },
-  // uploadFile: (req, res) => {
-  //   try {
-  //     let path = "/images";
-  //     const upload = uploader(path, "IMG").fields([{ name: "file" }]);
 
-  //     upload(req, res, (error) => {
-  //       if (error) {
-  //         console.log(error);
-  //         res.status(500).send(error);
-  //       }
-
-  //       const { file } = req.files;
-  //       const filepath = file ? path + "/" + file[0].filename : null;
-
-  //       let data = JSON.parse(req.body.data);
-  //       data.image = filepath;
-  //       let sqlInsert = `Insert into post values (
-  //         null,
-  //         ${db.escape(filepath)},
-  //         ${db.escape(data.keterangan)},
-  //         ${db.escape(data.id_user_yg_post)},
-  //         ${db.escape(data.lokasi)});`;
-
-  //       console.log(sqlInsert);
-  //       db.query(sqlInsert, (err, results) => {
-  //         if (err) {
-  //           fs.unlinkSync("./public" + filepath);
-  //           res.status(500).send(err);
-  //         }
-  //         res.status(200).send({ message: "Upload file success" });
-  //       });
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(500).send(error);
-  //   }
-  // },
   getPost: (req, res) => {
-    let sqlGet =
-      "select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal, (select count(id_post) from suka s where s.id_post = p.id_post) total_suka, (select count(id_komen_ini_ada_di_post_apa) from komentar k where k.id_komen_ini_ada_di_post_apa = p.id_post) total_komentar from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC limit 3 offset 0;";
+    console.log("testis");
+    let offset = (req.params.id - 1) * 3;
+    let sqlGet = `select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal, (select count(id_post) from suka s where s.id_post = p.id_post) total_suka, (select count(id_komen_ini_ada_di_post_apa) from komentar k where k.id_komen_ini_ada_di_post_apa = p.id_post) total_komentar from post p join users u on u.id_user= p.id_user_yg_post Order by id_post DESC  limit 3 offset ${offset};`;
 
     db.query(sqlGet, (err, results) => {
       if (err) {
@@ -78,7 +43,7 @@ module.exports = {
     console.log(req.params.idContent);
     let sqlGet = `select id_post, foto, keterangan, id_user, lokasi, namaPengguna, fotoProfil, tanggal from post p join users u on u.id_user= p.id_user_yg_post where id_post = ${db.escape(
       req.params.idContent
-    )};`;
+    )} limit 3;`;
 
     db.query(sqlGet, (err, results) => {
       if (err) {
