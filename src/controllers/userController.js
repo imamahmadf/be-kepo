@@ -11,9 +11,9 @@ module.exports = {
       .digest("hex");
     let scriptQuery = `Select * from users where namaPengguna=${db.escape(
       req.query.namaPengguna
-    )} or email = ${db.escape(
+    )} and kataSandi=${db.escape(req.query.kataSandi)} or email = ${db.escape(
       req.query.namaPengguna
-    )} and kataSandi=${db.escape(req.query.kataSandi)};`;
+    )} ;`;
     console.log(req.query, scriptQuery);
     db.query(scriptQuery, (err, results) => {
       if (err) res.status(500).send(err);
